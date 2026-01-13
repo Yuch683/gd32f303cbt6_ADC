@@ -1,2 +1,2 @@
-# gd32f303cbt6-freemodbus-GPIO
-gd32f303cbt6移植freemodbus控制GPIO
+# gd32f303cbt6-ADC
+gd32f303cbt6进行ADC
