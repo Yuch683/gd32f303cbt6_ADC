@@ -3,6 +3,9 @@
 #include "gd32f30x_timer.h"
 #include "gd32f30x_rcu.h"
 
+volatile uint32_t TIME1_COUNT = 0;
+volatile uint8_t adc_capture_flag = 0; 
+
 void timer1_Init(uint16_t period)
 {  
 		rcu_periph_clock_enable(RCU_TIMER1);
@@ -10,10 +13,10 @@ void timer1_Init(uint16_t period)
  
     timer_parameter_struct timer_initpara;		
 	
-    timer_initpara.prescaler         = 119 ;    //1MHz¼ÆÊýÆµÂÊ
+    timer_initpara.prescaler         = 119 ;    //1MHzè®¡æ•°é¢‘çŽ‡
     timer_initpara.alignedmode       = TIMER_COUNTER_EDGE;
     timer_initpara.counterdirection  = TIMER_COUNTER_UP;
-    timer_initpara.period            = period;     //period = 10000 --> ¶¨Ê±Æ÷ÖÜÆÚÎª10ms
+    timer_initpara.period            = period;     //period = 10000 --> å®šæ—¶å™¨å‘¨æœŸä¸º10ms
     timer_initpara.clockdivision     = TIMER_CKDIV_DIV1;
     timer_initpara.repetitioncounter = 0;
     timer_init(TIMER1,&timer_initpara);		
@@ -35,10 +38,20 @@ void TIMER1_IRQHandler(void){
 		
 		TIME1_COUNT++;
 		
-		if(TIME1_COUNT % 1000 == 0){										//LEDÃ¿ÃëÉÁË¸
-			
-			
+		if(TIME1_COUNT % 100 == 0){										// LEDæ¯ç§’é—ªçƒ
+			if(gpio_output_bit_get(GPIOA, GPIO_PIN_1) == SET){
+				gpio_bit_reset(GPIOA, GPIO_PIN_1);
+			}
+			else{
+				gpio_bit_set(GPIOA, GPIO_PIN_1);
+			}
 		}
 	}
-	
+		if(TIME1_COUNT % 500 == 0){										// ADCæ¯5ç§’é‡‡é›†
+			adc_capture_flag = 1;
+			
+			if(TIME1_COUNT > 500)
+				TIME1_COUNT = 0;
+		}
+	__enable_irq();
 }
